@@ -42,7 +42,7 @@ module.exports = (knex) => {
         .where("creator_uid", "=", req.session.userId)
         .then((results) => {
           results = results.map((product)=>{
-            product.total = product.click_count * product.cost;
+            product.total = Math.round(product.click_count * product.cost);
             return product;
           })
           let templateVars = {
