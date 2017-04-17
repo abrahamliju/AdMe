@@ -197,7 +197,7 @@ module.exports = (knex) => {
 
     let p_id = req.params.product_id;
     let u_id = req.session.userId;
-
+   
     knex("products").select("*").where({id: p_id})
       .then((results) => {
         if (results.length === 0) {
@@ -236,84 +236,6 @@ module.exports = (knex) => {
         }
     });
 });
-
-  // routes.get("/:product_id/share/fb", (req, res) => {
-  //   let p_id = req.params.product_id;
-  //   let userId = req.session.user_id;
-  //   // INSERT INTO shared_links (id,products_id, users_id, platform, cost, click_count) VALUES
-  //   knex
-  //     .raw(`INSERT INTO shared_links (products_id, users_id, platform, cost, click_count) VALUES (${p_id},${userId}?,FB,1.10,0) ON CONFLICT ("products_id", "users_id", "platform")
-  //   DO NOTHING`)
-  //     .then((result) => {
-
-  //     });
-  // });
-
-  // routes.get("/:product_id/share/tw", (req, res) => {
-  //   var p_id = req.params.product_id;
-  //   knex("products")
-  //     .select("*")
-  //     .where({ id: p_id })
-  //     .then((results) => {
-  //       let templateVars = {
-  //         product: results[0],
-  //         path: "asdf"
-  //       }
-  //       console.log(results[0]);
-  //       if (results.length > 0){
-  //         res.render("productPage", templateVars);
-  //       } else {
-  //         res.sendStatus(500);
-  //       }
-
-  //     });
-  // });
-
-
-  routes.get("/:product_id", (req, res) => {
-
-    let p_id = req.params.product_id;
-    let u_id = req.session.userId;
-
-    knex("products").select("*").where({id: p_id})
-      .then((results) => {
-        if (results.length === 0) {
-          res.sendStatus(500);
-          return;
-        }
-        let product = results[0];
-        let empty_id = {id: null};
-        if (u_id) {
-          knex.raw(`INSERT INTO shared_links (products_id, users_id, platform, cost, click_count)
-            VALUES (${p_id}, ${u_id}, 'FB', 1.10, 0), (${p_id} ,${u_id}, 'TW', 0.5, 0)
-            ON CONFLICT ("products_id", "users_id", "platform") DO NOTHING`)
-          .then (() => {
-            knex("shared_links").select("id").where({products_id: p_id, users_id: u_id})
-              .then((sl_list) => {
-                console.log(sl_list[0], sl_list[1]);
-                let templateVars = {
-                  product: product,
-                  path: "/view",
-                  shareFb: sl_list[0],
-                  shareTw: sl_list[1],
-                  user: 1
-                }
-                res.render("productPage", templateVars);
-            });
-          });
-        } else {
-          let templateVars = {
-              product: product,
-              path: "/view",
-              shareFb: empty_id,
-              shareTw: empty_id,
-              user: 0
-          }
-          res.render("productPage", templateVars);
-        }
-    });
-  });
-
 
   return routes;
 }
